@@ -1,13 +1,13 @@
-name: SelfieSat
-norad: 53951
+name: BlueWalker 3
+norad: 53807
 data:
   &tlm Telemetry:
     unknown
 transmitters:
-  9k6 FSK downlink:
+  2k4 FSK downlink:
     frequency: 437.500e+6
     modulation: FSK
-    baudrate: 9600
-    framing: AX.25 G3RUH
+    baudrate: 2400
+    framing: Light-1
     data:
     - *tlm
