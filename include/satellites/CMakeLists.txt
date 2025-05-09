@@ -37,6 +37,7 @@ install(FILES
     encode_rs.h
     fixedlen_to_pdu.h
     lilacsat1_demux.h
+    manchester_sync.h
     matrix_deinterleaver_soft.h
     nrzi_decode.h
     nrzi_encode.h
@@ -46,6 +47,7 @@ install(FILES
     pdu_length_filter.h
     pdu_scrambler.h
     phase_unwrap.h
+    selector.h
     u482c_decode.h
     varlen_packet_framer.h
     varlen_packet_tagger.h

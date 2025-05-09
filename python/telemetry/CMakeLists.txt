@@ -33,12 +33,18 @@ GR_PYTHON_INSTALL(
     FILES
     __init__.py
     aausat4.py
+    aepex_70cm.py
+    aepex_sw_stat.py
     amicalsat.py
+    asrtu.py
     au03.py
     ax25.py
     binar1.py
     by02.py
     by70_1.py
+    ccsds.py
+    cirbe_70cm.py
+    cirbe_bct_soh.py
     csp.py
     ctim_70cm.py
     cute_70cm.py
@@ -48,6 +54,7 @@ GR_PYTHON_INSTALL(
     delfic3.py
     delfipq.py
     dstar_one.py
+    erminaz.py
     eseo.py
     fossasat.py
     fossasat_1b.py

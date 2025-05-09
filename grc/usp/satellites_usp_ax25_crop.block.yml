@@ -1,4 +1,4 @@
-id: satellites_usp_ax.25_crop
+id: satellites_usp_ax25_crop
 label: USP AX.25 Crop
 category: '[Satellites]/USP'
 
@@ -12,7 +12,7 @@ outputs:
 
 templates:
     imports: import satellites.usp
-    make: satellites.usp.usp_pls_crop()
+    make: satellites.usp.usp_ax25_crop()
 
 documentation: |-
     Extracts the AX.25 encapsulated in a USP packet

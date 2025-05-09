@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2019 Daniel Estevez <daniel@destevez.net>
+# Copyright 2019-2023 Daniel Estevez <daniel@destevez.net>
 #
 # This file is part of gr-satellites
 #
@@ -36,14 +36,17 @@ class SatYAML:
         'K2SAT', 'CCSDS Reed-Solomon', 'CCSDS Concatenated', 'CCSDS Uncoded',
         'LilacSat-1', 'AAUSAT-4', 'NGHam', 'NGHam no Reed Solomon',
         'SMOG-P RA', 'SMOG-1 RA', 'SMOG-P Signalling', 'SMOG-1 Signalling',
+        'MRC-100 RA',
         'OPS-SAT', 'U482C', 'UA01', 'SALSAT', 'Mobitex', 'Mobitex-NX',
         'FOSSASAT', 'AISTECHSAT-2', 'AALTO-1', 'Grizu-263A', 'IDEASSat',
-        'YUSAT', 'AX5043', 'USP', 'AO-40 FEC CRC-16-ARC',
+        'YUSAT', 'AX5043', 'USP', 'AO-40 FEC CRC-16-ARC', 'Hades',
         'AO-40 FEC CRC-16-ARC short', 'DIY-1', 'BINAR-1', 'Endurosat',
         'SanoSat', 'FORESAIL-1', 'HSU-SAT1', 'GEOSCAN', 'Light-1',
+        'SPINO', 'QUBIK', 'BINAR-2', 'OpenLST',
         ]
     transports = [
-        'KISS', 'KISS no control byte', 'KISS KS-1Q',
+        'KISS', 'KISS no control byte', 'KISS KS-1Q', 'TM KISS',
+        'TM short KISS',
         ]
     top_level_words = [
         'name', 'alternative_names', 'norad', 'telemetry_servers',
@@ -63,7 +66,8 @@ class SatYAML:
             raise YAMLError(f'NORAD field does not contain a number in {yml}')
         if 'telemetry_servers' in d:
             for server in d['telemetry_servers']:
-                if (server not in ['SatNOGS', 'FUNcube', 'PWSat', 'BME']
+                if (server not in ['SatNOGS', 'FUNcube', 'PWSat', 'BME',
+                                   'BMEWS']
                         and not server.startswith('HIT ')
                         and not server.startswith('SIDS ')):
                     raise YAMLError(f'Unknown telemetry server {server}')
@@ -77,6 +81,17 @@ class SatYAML:
                 if transport['protocol'] not in self.transports:
                     raise YAMLError(
                         f'Unknown protocol field in transport {key}')
+                if transport['protocol'] in ['TM KISS', 'TM short KISS']:
+                    if 'virtual_channels' not in transport:
+                        raise YAMLError(
+                            f'virtual_channels field missing in '
+                            f'transport {key}')
+                    if not isinstance(transport['virtual_channels'], list):
+                        raise YAMLError('virtual_channels is not a list')
+                    for vc in transport['virtual_channels']:
+                        if not isinstance(vc, int):
+                            raise YAMLError(
+                                'virtual_channel value is not an int')
         if 'transmitters' not in d:
             raise YAMLError(f'Missing transmitters field in {yml}')
         for key, transmitter in d['transmitters'].items():
@@ -112,6 +127,11 @@ class SatYAML:
                     and type(transmitter['deviation']) not in [float, int]):
                 raise YAMLError(
                     'Deviation field does not contain a float '
+                    f'in {key} in {yml}')
+            if ('fm_deviation' in transmitter
+                    and type(transmitter['fm_deviation']) not in [float, int]):
+                raise YAMLError(
+                    'FM deviation field does not contain a float '
                     f'in {key} in {yml}')
             if 'framing' not in transmitter:
                 raise YAMLError(f'Missing framing field in {key} in {yml}')
@@ -209,6 +229,18 @@ class SatYAML:
             if norad == self._get_satnorad(yml):
                 return self.get_yamldata(yml)
         raise ValueError('satellite not found')
+
+    def open_satyaml(self, file=None, name=None, norad=None):
+        if sum([x is not None for x in [file, name, norad]]) != 1:
+            raise ValueError(
+                'exactly one of file, name and norad needs to be specified')
+
+        if file is not None:
+            return self.get_yamldata(file)
+        elif name is not None:
+            return self.search_name(name)
+        else:
+            return self.search_norad(norad)
 
 
 yamlfiles = SatYAML()

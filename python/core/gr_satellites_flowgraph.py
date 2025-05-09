@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2019 Daniel Estevez <daniel@destevez.net>
+# Copyright 2019-2023 Daniel Estevez <daniel@destevez.net>
 #
 # This file is part of gr-satellites
 #
@@ -130,7 +130,7 @@ class gr_satellites_flowgraph(gr.hier_block2):
         elif samp_rate is None:
             raise ValueError('samp_rate not specified')
 
-        self.satyaml = satyaml = self.open_satyaml(file, name, norad)
+        self.satyaml = satyaml = yamlfiles.open_satyaml(file, name, norad)
 
         if grc_block:
             self.message_port_register_hier_out('out')
@@ -203,7 +203,8 @@ class gr_satellites_flowgraph(gr.hier_block2):
         if self.options is not None and self.options.kiss_server:
             self._additional_datasinks.append(
                 datasinks.kiss_server_sink(self.options.kiss_server_address,
-                                           self.options.kiss_server))
+                                           self.options.kiss_server,
+                                           options=self.options))
         if self.options is not None and self.options.zmq_pub:
             self._additional_datasinks.append(
                 zeromq.pub_msg_sink(self.options.zmq_pub))
@@ -225,7 +226,7 @@ class gr_satellites_flowgraph(gr.hier_block2):
             self._additional_datasinks.append(datasinks.hexdump_sink())
 
     def _init_transport(self, key, info):
-        """Initialize a datasink
+        """Initialize a transport
 
         Initializes a transport according to a SatYAML entry and connects
         it to the appropriate datasink
@@ -234,7 +235,11 @@ class gr_satellites_flowgraph(gr.hier_block2):
             key: the name of the transport entry in SatYAML
             info: the body of the transport entry in SatYAML
         """
-        transport = self.get_transport(info['protocol'])()
+        if 'virtual_channels' in info:
+            args = {'virtual_channels': info['virtual_channels']}
+        else:
+            args = {}
+        transport = self.get_transport(info['protocol'])(**args)
         self._transports[key] = transport
         if not self.options.hexdump:
             for data in info['data']:
@@ -252,7 +257,7 @@ class gr_satellites_flowgraph(gr.hier_block2):
             transmitter: transmitter entry in the SatYAML
         """
         baudrate = transmitter['baudrate']
-        demod_options = ['deviation', 'af_carrier']
+        demod_options = ['deviation', 'fm_deviation', 'af_carrier']
         demod_options = {k: k for k in demod_options}
         demodulator_additional_options = filter_translate_dict(transmitter,
                                                                demod_options)
@@ -329,7 +334,7 @@ class gr_satellites_flowgraph(gr.hier_block2):
         The telemetry submitters are those appropriate for this satellite
 
         Args:
-            satyaml: satellite YAML file, as returned by self.open_satyaml
+            satyaml: satellite YAML file, as returned by yamlfiles.open_satyaml
             config: configuration file from configparser
         """
         norad = satyaml['norad']
@@ -359,24 +364,9 @@ class gr_satellites_flowgraph(gr.hier_block2):
     def get_transport(self, protocol):
         return self._transport_hooks[protocol]
 
-    @staticmethod
-    def open_satyaml(file, name, norad):
-        if sum([x is not None for x in [file, name, norad]]) != 1:
-            raise ValueError(
-                'exactly one of file, name and norad needs to be specified')
-
-        if file is not None:
-            satyaml = yamlfiles.get_yamldata(file)
-        elif name is not None:
-            satyaml = yamlfiles.search_name(name)
-        else:
-            satyaml = yamlfiles.search_norad(norad)
-
-        return satyaml
-
     @classmethod
     def add_options(cls, parser, file=None, name=None, norad=None):
-        satyaml = cls.open_satyaml(file, name, norad)
+        satyaml = yamlfiles.open_satyaml(file, name, norad)
 
         demod_options = parser.add_argument_group('demodulation')
         deframe_options = parser.add_argument_group('deframing')
@@ -451,7 +441,9 @@ class gr_satellites_flowgraph(gr.hier_block2):
                                              decode_rs=False),
         'SMOG-P RA': deframers.smogp_ra_deframer,
         'SMOG-1 RA': set_options(deframers.smogp_ra_deframer,
-                                 new_protocol=True),
+                                 variant='SMOG-1'),
+        'MRC-100 RA': set_options(deframers.smogp_ra_deframer,
+                                  variant='MRC-100'),
         'SMOG-P Signalling': deframers.smogp_signalling_deframer,
         'SMOG-1 Signalling': set_options(deframers.smogp_signalling_deframer,
                                          new_protocol=True),
@@ -470,6 +462,7 @@ class gr_satellites_flowgraph(gr.hier_block2):
         'USP': deframers.usp_deframer,
         'DIY-1': deframers.diy1_deframer,
         'BINAR-1': deframers.binar1_deframer,
+        'BINAR-2': deframers.binar2_deframer,
         'Endurosat': deframers.endurosat_deframer,
         'SanoSat': deframers.sanosat_deframer,
         'FORESAIL-1': set_options(
@@ -481,6 +474,10 @@ class gr_satellites_flowgraph(gr.hier_block2):
         'Light-1': set_options(
             deframers.reaktor_hello_world_deframer,
             syncword='light-1'),
+        'SPINO': deframers.spino_deframer,
+        'QUBIK': deframers.qubik_deframer,
+        'Hades': deframers.hades_deframer,
+        'OpenLST': deframers.openlst_deframer,
         }
     _transport_hooks = {
         'KISS': transports.kiss_transport,
@@ -488,4 +485,7 @@ class gr_satellites_flowgraph(gr.hier_block2):
                                             control_byte=False),
         'KISS KS-1Q': set_options(transports.kiss_transport,
                                   control_byte=False, header_remove_bytes=3),
+        'TM KISS': transports.tm_kiss_transport,
+        'TM short KISS': set_options(transports.tm_kiss_transport,
+                                     short_tm=True),
         }

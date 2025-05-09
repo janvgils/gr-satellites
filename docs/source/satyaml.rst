@@ -92,7 +92,7 @@ The modulations allowed in the ``modulation`` field are the following:
 
 * ``FSK subaudio``, for which the :ref:`FSK demodulator` with Subaudio set to
   ``True`` is used
-  
+
 * ``BPSK``. Coherent BPSK, for which the :ref:`BPSK demodulator` with
   Differential and Manchester set to ``False`` is used
 
@@ -109,8 +109,10 @@ The modulations allowed in the ``modulation`` field are the following:
   ``True`` is used to perform non-coherent demodulation
 
 The ``AFSK`` modulation also needs the ``deviation`` and ``af_carrier`` fields
-that indicate the AFSK tone frequencies in Hz, as in the AFSK demodulator.
-  
+that indicate the AFSK tone frequencies in Hz, as in the AFSK demodulator. Optionally,
+it is possible to indicate the deviation of the FM modulation using the ``fm_deviation``
+field. By default, an FM deviation of 3 kHz is assumed.
+
 The framings allowed in the ``framing`` field are the following:
 
 * ``AX.25``, `AX.25`_ with no scrambling (see :ref:`AX.25 deframer`)
@@ -201,6 +203,10 @@ The framings allowed in the ``framing`` field are the following:
   ``SMOG-P RA`` is a longer 48 bit syncword (instead of 16 bit) and the inclusion
   of a CRC-16 ARC to check frame integrity.
 
+* ``MRC-100 RA``, Repeat-Accumulate FEC as used by SMOG-1. The difference with
+  ``SMOG-P RA`` is a 32-bit syncword, a smaller frame size, and the inclusion of
+  a CRC-16-CCITT-FALSE in the second and third byte to check frame integrity.
+
 * ``SMOG-P Signalling``, custom signalling frames as used by SMOG-P and ATL-1
 
 * ``SMOG-1 Signalling``, custom signalling frames as used by SMOG-1. The difference
@@ -220,7 +226,7 @@ The framings allowed in the ``framing`` field are the following:
   from TU Berlin
 
 * ``FOSSATSAT``, a custom protocol used by FOSSASAT
-  
+
 * ``AISTECHSAT-2``, a custom CCSDS-like protocol used by AISTECHSAT-2
 
 * ``AALTO-1``, custom framing used by AALTO-1. It uses a
@@ -247,6 +253,8 @@ The framings allowed in the ``framing`` field are the following:
 
 * ``BINAR-1``, the custom framing used by the BINAR-1 satellite.
 
+* ``BINAR-2``, the custom framing used by the BINAR-2, 3 and 4 satellites.
+
 * ``Endurosat``, the custom framing used by the Endurosat modem.
 
 * ``SanoSat``, the custom framing used by SanoSat-1.
@@ -257,7 +265,16 @@ The framings allowed in the ``framing`` field are the following:
 * ``HSU-SAT1``, the custom framing used by HSU-SAT1.
 
 * ``GEOSCAN``, the custom framing used by GEOSCAN-EDELVEIS.
-  
+
+* ``SPINO``, the custom framing used by the SPINO payload on INSPIRE-Sat7.
+
+* ``QUBIK``, the custom framing used by QUBIK.
+
+* ``Hades``, the custom framing used by HADES-D.
+
+* ``OpenLST``, OpenLST protocol framing, with FEC (convolutional coding) and PN9
+  whitening.
+
 Some framings, such as the CCSDS protocols need the additional field
 ``frame size`` to indicate the frame size.
 
@@ -325,7 +342,12 @@ The allowable transport protocols are the following:
 
 * ``KISS KS-1Q``, KISS variant used by KS-1Q, which includes a header before the
   KISS bytes
-  
+
+* ``TM KISS``, TM frames containing a KISS stream in some virtual channels
+
+* ``TM short KISS``, short (5 byte) TM frames containing a KISS stream in some
+  virtual channels
+
 .. _YAML: https://yaml.org/
 .. _AX.25: http://www.ax25.net/
 .. _FX.25: https://en.wikipedia.org/wiki/FX.25_Forward_Error_Correction

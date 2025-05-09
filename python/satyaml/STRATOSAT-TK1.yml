@@ -1,0 +1,17 @@
+name: STRATOSAT-TK1
+alternative_names:
+   - RS52S
+norad: 57167
+data:
+   &tlm Telemetry:
+     unknown
+transmitters:
+   9k6 FSK downlink:
+     frequency: 435.870e+6
+     modulation: FSK
+     baudrate: 9600
+     deviation: 4800
+     framing: GEOSCAN
+     frame size: 66
+     data:
+     - *tlm

@@ -43,6 +43,7 @@ list(APPEND satellites_python_files
     encode_rs_python.cc
     fixedlen_to_pdu_python.cc
     lilacsat1_demux_python.cc
+    manchester_sync_python.cc
     matrix_deinterleaver_soft_python.cc
     nrzi_decode_python.cc
     nrzi_encode_python.cc
@@ -53,6 +54,7 @@ list(APPEND satellites_python_files
     pdu_scrambler_python.cc
     phase_unwrap_python.cc
     python_bindings.cc
+    selector_python.cc
     u482c_decode_python.cc
     varlen_packet_framer_python.cc
     varlen_packet_tagger_python.cc

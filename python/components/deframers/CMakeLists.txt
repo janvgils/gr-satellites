@@ -42,6 +42,7 @@ GR_PYTHON_INSTALL(
     ax25_deframer.py
     ax5043_deframer.py
     binar1_deframer.py
+    binar2_deframer.py
     ccsds_concatenated_deframer.py
     ccsds_rs_deframer.py
     diy1_deframer.py
@@ -50,6 +51,7 @@ GR_PYTHON_INSTALL(
     fossasat_deframer.py
     geoscan_deframer.py
     grizu263a_deframer.py
+    hades_deframer.py
     hsu_sat1_deframer.py
     ideassat_deframer.py
     k2sat_deframer.py
@@ -58,13 +60,16 @@ GR_PYTHON_INSTALL(
     mobitex_deframer.py
     ngham_deframer.py
     nusat_deframer.py
+    openlst_deframer.py
     ops_sat_deframer.py
+    qubik_deframer.py
     reaktor_hello_world_deframer.py
     sanosat_deframer.py
     sat_3cat_1_deframer.py
     smogp_ra_deframer.py
     smogp_signalling_deframer.py
     snet_deframer.py
+    spino_deframer.py
     swiatowid_deframer.py
     tt64_deframer.py
     u482c_deframer.py

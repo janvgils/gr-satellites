@@ -19,8 +19,9 @@ basic information about the arguments it allows.
    $ gr_satellites
    usage: gr_satellites satellite [-h] [--version] [--list_satellites]
                                [--ignore_unknown_args]
+                               [--satcfg]
                                (--wavfile WAVFILE | --rawfile RAWFILE | --rawint16 RAWINT16 | --audio [DEVICE] | --udp | --kiss_in KISS_IN)
-                               [--samp_rate SAMP_RATE] [--udp_ip UDP_IP]
+                               [--samp_rate SAMP_RATE]
                                [--udp_port UDP_PORT] [--iq] [--udp_raw]
                                [--input_gain INPUT_GAIN]
                                [--start_time START_TIME] [--throttle]
@@ -164,8 +165,8 @@ the input source by using exactly one of the following options:
   If the ``--udp_raw`` is used the format will be the same as for ``--rawfile``.
 
   By default, ``gr_satellites`` will listen on the IP address ``::`` (all
-  addresses) and the UDP port 7355. A different IP address or port can be
-  specified using the parameters ``--udp_ip`` and ``--udp_port``.
+  addresses) and the UDP port 7355. A different port can be
+  specified using the parameter ``--udp_port``.
 
   .. note::
      `GQRX`_ can stream audio in UDP using this format and UDP port,
@@ -207,7 +208,7 @@ For example, this shows all the options allowed by the FUNcube-1 decoder:
    $ gr_satellites FUNcube-1 --help
    usage: gr_satellites satellite [-h] [--version] [--list_satellites]
 				  (--wavfile WAVFILE | --rawfile RAWFILE | --rawint16 RAWINT16 | --audio [DEVICE] | --udp | --kiss_in KISS_IN)
-				  [--samp_rate SAMP_RATE] [--udp_ip UDP_IP]
+				  [--samp_rate SAMP_RATE]
 				  [--udp_port UDP_PORT] [--iq]
 				  [--input_gain INPUT_GAIN]
 				  [--start_time START_TIME] [--throttle]
@@ -232,6 +233,7 @@ For example, this shows all the options allowed by the FUNcube-1 decoder:
      --version             show program's version number and exit
      --list_satellites     list supported satellites and exit
      --ignore_unknown_args Treat unknown arguments as warning
+     --satcfg              Use default options from sat.cfg for named satellite
 
    input:
      --wavfile WAVFILE     WAV/OGG/FLAC input file (using libsndfile)
@@ -242,7 +244,6 @@ For example, this shows all the options allowed by the FUNcube-1 decoder:
      --kiss_in KISS_IN     KISS input file
      --samp_rate SAMP_RATE
 			   Sample rate (Hz)
-     --udp_ip UDP_IP       UDP input listen IP [default='::']
      --udp_port UDP_PORT   UDP input listen port [default='7355']
      --iq                  Use IQ input
      --input_gain INPUT_GAIN
@@ -498,7 +499,10 @@ certain satellite projects:
 
 * `PW-Sat2 Groundstation`_, which is used by PW-Sat2.
 
-* The `BME telemetry server`_, which is used by SMOG-P, ATL-1 and SMOG-1.
+* The `BME telemetry server`_, which is used by SMOG-P, ATL-1 and SMOG-1. (This
+  server is deprecated, since it is not used anymore by BME).
+
+* The `BME telemetry server (WebSocket)`_, which is used by MRC-100.
 
 * `Harbin Institute of Technology`_, which connects to the telemetry proxy included in
   `gr-lilacsat`_ and `gr-dslwp`_.
@@ -551,6 +555,9 @@ have an account registered in the server to obtain the credentials file.
 To enable telemetry submission to the BME server, it is necessary to
 `register an account in the BME server`_. The user and password should be
 entered into the gr-satellites ``.ini`` file.
+
+The BME server (WebSocket) does not require any registration or additional
+configuration.
 
 To use the Harbin Institute of Technology proxy to submit telemetry, the proxy
 needs to be run and started in the local computer before running
@@ -753,6 +760,22 @@ arguments to a warning instead of exiting with an error. This can be useful when
 running in automated scripts and some options may not be available on that satellite.
 For example the ``--f_offset`` and ``--use_agc``
 
+Using sat.cfg for default arguments
+"""""""""""""""""""""""""""""""""""
+
+With ``--satcfg`` the configuration file `~/.gr_satellites/sat.cfg` will be read and arguments
+added automatically to the command line. Some of these can be overridden with specifying
+them on the command line again.
+The format of the file is one row per satellite, first the norad ID then the rest of the row is treated as aguments.
+
+Example:
+
+.. code-block:: ini
+
+    39444 --f_offset 12000
+    46276 --disable_dc_block --deviation 500 --clk_bw 0.15
+    35933 --clk_bw 0.3
+
 
 .. _GQRX: https://gqrx.dk/
 .. _gr-frontends: https://github.com/daniestevez/gr-frontends
@@ -762,6 +785,7 @@ For example the ``--f_offset`` and ``--use_agc``
 .. _FUNcube Warehouse: http://warehouse.funcube.org.uk/
 .. _PW-Sat2 Groundstation: https://radio.pw-sat.pl/
 .. _BME telemetry server: https://gnd.bme.hu:8080/
+.. _BME telemetry server (WebSocket): https://gnd.bme.hu/
 .. _registering in the warehouse: http://warehouse.funcube.org.uk/registration
 .. _Your credentials: https://radio.pw-sat.pl/communication/yourcredentials
 .. _register an account in the BME server: https://gnd.bme.hu:8080/auth/register

@@ -19,18 +19,23 @@ object, but in more complex cases, another class supporting the
 import construct
 
 from .aausat4 import aausat4
+from .aepex_70cm import aepex_70cm
 from .amicalsat import amicalsat
+from .asrtu import asrtu
 from .au03 import au03
 from .ax25 import ax25
 from .binar1 import binar1
 from .by02 import by02
 from .by70_1 import by70_1
+from .cirbe_70cm import cirbe_70cm
 from .csp import csp
+from .csp import cspv2
 from .ctim_70cm import ctim_70cm
 from .cute_70cm import cute_70cm
 from .delfic3 import delfic3
 from .delfipq import delfipq
 from .dstar_one import dstar_one
+from .erminaz import erminaz
 from .eseo import eseo
 from .floripasat import floripasat
 from .fossasat_1b import fossasat_1b
